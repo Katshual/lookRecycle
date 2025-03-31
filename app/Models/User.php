@@ -9,24 +9,24 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
-
     /**
-     * The attributes that are mass assignable.
+     * Les attributs modifiables en masse.
+     * Permet de définir les champs qui peuvent être assignés lors de la création ou mise à jour d'un utilisateur.
      *
-     * @var list<string>
+     * @var array<string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role', // Ajout du champ "role"
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Les attributs à masquer dans les réponses JSON.
+     * On cache le mot de passe et le token de connexion pour des raisons de sécurité.
      *
-     * @var list<string>
+     * @var array<string>
      */
     protected $hidden = [
         'password',
@@ -34,15 +34,36 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Les attributs qui doivent être castés (convertis automatiquement) avant d’être utilisés.
+     * Cela permet de s'assurer que certains champs sont bien formatés.
      *
      * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'email_verified_at' => 'datetime', // Convertit la date de vérification en format DateTime
+            'password' => 'hashed', // Stocke le mot de passe sous forme de hash sécurisé
         ];
     }
+
+    /**
+     * Définir les valeurs par défaut des attributs.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'role' => 'acheteur', // Par défaut, un nouvel utilisateur est un acheteur
+    ];
+
+    /**
+     * Vérifie si l'utilisateur a le rôle "vendeur".
+     *
+     * @return bool
+     */
+    public function isVendeur(): bool
+    {
+        return $this->role === 'vendeur';
+    }
 }
+
